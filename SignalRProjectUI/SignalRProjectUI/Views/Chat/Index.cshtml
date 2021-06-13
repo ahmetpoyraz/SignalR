@@ -1,0 +1,275 @@
+﻿@model List<ActiveUsers>
+
+
+
+<script>
+    var activeUser = "";
+    var authenticatedUser = "";
+    var authenticateUser = "@User.Identity.Name";
+
+
+    $(document).ready(() => {
+
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/ChatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.start();
+
+        $('#action_menu_btn').click(function () {
+            $('.action_menu').toggle();
+        });
+
+        $("body").on("click", "chat_people", function () {
+
+
+        }
+
+
+        )
+
+
+
+        connection.on("userDisconnected", userName => {
+            $("#userDisconnected").html(`${userName} ayrıldı.`);
+            $("#userDisconnected").fadeIn(2000, () => {
+                setTimeout(() => {
+                    $("#userDisconnected").fadeOut(2000);
+                }, 2000)
+            });
+
+            $("#" + userName).remove();
+        })
+
+        connection.on("userJoined", userName => {
+            $("#userJoined").html(`${userName} bağlandı.`);
+            $("#userJoined").fadeIn(2000, () => {
+                setTimeout(() => {
+                    $("#userJoined").fadeOut(2000);
+                }, 2000)
+            });
+
+        })
+
+        connection.on("onlineUsers", result => {
+            $("#onlineUsers").empty();
+
+
+            $.each(result, function (index, value) {
+
+                if (value.userName != authenticateUser)
+                {
+                    var xx = "'" + value.userName + "'";
+
+                    $(".inbox_chat").append('<button style="width:100%; border-style: none;" onClick="userClick(' + xx + ')"><div class="chat_list" id="kul_' + value.userName + '"><div  class="chat_people"> <div class="chat_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div> <div class="chat_ib"><h5>' + value.userName + '<span class="chat_date" id="notification_' + value.userName + '"></span></h5></div></div></div></button>')
+
+                } 
+
+
+            });
+
+        });
+        connection.on("receiveMessage", message => {
+
+            //activeUser = message.reciever;
+
+            let jsMessage = message.message.trim();
+            let notification = "notification_" + message.sender;
+            if (message.sender == activeUser && jsMessage.length > 0) {
+
+
+
+                $(".msg_history").append('<div class="incomiitemguserName_msg"><div class="received_msg"> <div class="received_withd_msg"> <p>' + message.message + ' </p> <span class="time_date"> ' + message.hour + '</span> </div> </div> </div>');
+
+
+            }
+
+            $("#" + notification).append('<i class="fas fa-comment-dots fa-2x"></i><br>Yeni Mesaj');
+            $('.msg_history').scrollTop($('.msg_history')[0].scrollHeight);
+
+
+        });
+
+
+        $("#btnGonder").click(() => {
+
+
+            let message = $("#txtMessage").val().trim();
+            if (message.length > 0) {
+                $(".msg_history").append('<div class="outgoing_msg"><div class="sent_msg"><p> ' + message + '</p><span class="time_date"></span></div></div>');
+                $('.msg_history').scrollTop($('.msg_history')[0].scrollHeight);
+                connection.invoke("SendMessageAsync", message, activeUser).catch(error => console.log(`Mesaj Gonderilirken Hata Oluştu ${error}`));
+                $("#txtMessage").val('');
+
+            }
+
+
+        })
+
+        $('#txtMessage').keypress(function (e) {
+            if (e.which == 13) {
+                let message = $("#txtMessage").val().trim();
+
+                if (message.length > 0) {
+                    $(".msg_history").append('<div class="outgoing_msg"><div class="sent_msg"><p> ' + message + '</p><span class="time_date"></span></div></div>');
+                    $('.msg_history').scrollTop($('.msg_history')[0].scrollHeight);
+
+                    connection.invoke("SendMessageAsync", message, activeUser).catch(error => console.log(`Mesaj Gonderilirken Hata Oluştu ${error}`));
+
+                    $("#txtMessage").val('');
+                }
+
+            }
+        });
+
+        $("#txtMessage").click(() => {
+            let notification = "notification_" + activeUser;
+            $('#' + notification).empty();
+        });
+
+    });
+
+    function userClick(parameter) {
+
+        activeUser = parameter;
+       
+        let notification = "notification_" + activeUser;
+
+        $("#receiver").html(parameter);
+        $('#' + notification).empty();
+
+        $('[id^=kul_]').css("background-color", "#efefef");
+        $("#kul_" + activeUser).css("background-color", "#5fdba7");
+
+        $.ajax({
+            url: '/Chat/GetMessage',
+            type: 'POST',
+            data: { data: parameter },
+            dataType: 'json',
+            success: function (data) {
+                $(".msg_history").empty();
+                $.each(data, function (index, value) {
+
+
+                    var msgSender = value.sender;
+
+                    if (msgSender == parameter) {
+
+                        $(".msg_history").append('<div class="incoming_msg"><div class="received_msg"> <div class="received_withd_msg"> <p>' + value.message + ' </p> <span class="time_date">'+ value.hour+'</span> </div> </div> </div>');
+
+                    }
+                    else {
+                        var msg = value.message;
+
+                        $(".msg_history").append('<div class="outgoing_msg"><div class="sent_msg"><p> ' + msg + '</p><span class="time_date">' + value.hour + '</span></div></div>');
+                    }
+
+
+
+                });
+                $('.msg_history').scrollTop($('.msg_history')[0].scrollHeight);
+            }
+        });
+    }
+
+</script>
+
+
+
+
+
+
+<br />
+<br />
+<br />
+
+<div class="container">
+    <h3 class=" text-center">Mesajlar</h3>
+    <br />
+
+    <div class="alert alert-success" id="userJoined" style="display:none;">
+
+    </div>
+    <div class="alert alert-danger" id="userDisconnected" style="display:none;">
+
+    </div>
+    <div class="messaging">
+        <div class="inbox_msg">
+            <div class="inbox_people">
+                <div class="headind_srch">
+                    <div class="recent_heading">
+                        <h4>Kişiler</h4>
+                    </div>
+                    <div class="srch_bar">
+                        <div class="stylish-input-group">
+                            <input type="text" class="search-bar" placeholder="Search">
+                            <span class="input-group-addon">
+                                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="inbox_chat" id="onlineUsers">
+
+
+                    @foreach (var item in Model)
+                    {
+                        if (item.userName != User.Identity.Name)
+                        {
+                            <button style="width:100%; border-style: none;" onClick="userClick('@item.userName.Trim()')">
+                                <div class="chat_list" id="kul_@item.userName.Trim()">
+                                    <div class="chat_people">
+                                        <div class="chat_img">
+                                            <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                                        </div> <div class="chat_ib">
+                                            <h5>
+                                                @item.userName
+                                                <span class="chat_date" id="notification_@item.userName">
+
+                                                </span>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        }
+
+
+
+
+                    }
+
+
+
+                </div>
+            </div>
+            <div class="mesgs">
+                <h4 class="text-center" style="color: #05728f;font-size: 21px;" id="receiver"></h4>
+                <hr style="border-bottom:1px solid #05728f;" />
+                <div id="msghistory" class="msg_history">
+
+
+
+                </div>
+                <div class="type_msg">
+                    <div class="input_msg_write">
+                        <input id="txtMessage" type="text" class="write_msg" placeholder="Bir mesaj gönder.." />
+                        <button id="btnGonder" class="msg_send_btn" type="button">
+                            <i class="far fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div id="deneme">
+
+
+    </div>
+</div>
