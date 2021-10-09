@@ -9597,19 +9597,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\LENOVO\\.nuget\\packages\\": {}
+    "C:\\Users\\ahmet\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\LENOVO\\source\\repos\\SignalRProjectUI\\SignalRProjectUI\\SignalRProjectUI.csproj",
+      "projectUniqueName": "C:\\Users\\ahmet\\source\\repos\\SignalR\\SignalRProjectUI\\SignalRProjectUI\\SignalRProjectUI.csproj",
       "projectName": "SignalRProjectUI",
-      "projectPath": "C:\\Users\\LENOVO\\source\\repos\\SignalRProjectUI\\SignalRProjectUI\\SignalRProjectUI.csproj",
-      "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\LENOVO\\source\\repos\\SignalRProjectUI\\SignalRProjectUI\\obj\\",
+      "projectPath": "C:\\Users\\ahmet\\source\\repos\\SignalR\\SignalRProjectUI\\SignalRProjectUI\\SignalRProjectUI.csproj",
+      "packagesPath": "C:\\Users\\ahmet\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ahmet\\source\\repos\\SignalR\\SignalRProjectUI\\SignalRProjectUI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ahmet\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9684,7 +9684,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
       }
     }
   }
